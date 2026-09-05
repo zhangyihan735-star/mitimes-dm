@@ -46,4 +46,4 @@ DM 数据目前仍在 `index.html` 的 `dms` 数组中，适合原型演示，�
 
 前端接入后，将 `dms` 数组替换成 Supabase 查询；审核通过后更新 `dm_profiles`，前台下次加载自动读取最新资料。照片上传使用 Supabase Storage，数据库只保存图片 URL。
 
-正式接入前还需要配置：Supabase 项目、管理员账号、微信登录参数，以及 Vercel 的环境变量。
+正式接入前还需要配置：Supabase 项目、管理员账号、微信登录参数，以及 GitHub Pages 或 Vercel 的环境变量。
