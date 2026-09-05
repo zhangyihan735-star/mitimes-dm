@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0c0b0d" />
+  <title>秘Times · DM人物档案</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #f4eee5;
+      --muted: #a79d98;
+      --muted-light: #c7bdb5;
+      --bg: #0d0c0f;
+      --bg-soft: #141216;
+      --panel: rgba(28, 23, 28, .84);
+      --panel-solid: #1b171d;
+      --line: rgba(244, 238, 229, .13);
+      --line-bright: rgba(244, 238, 229, .26);
+      --wine: #9e3c48;
+      --wine-light: #cf7b7e;
+      --gold: #d6b285;
+      --cream: #eaddca;
+      --serif: "Noto Serif SC", "Songti SC", serif;
+      --sans: "Outfit", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-width: 320px;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .app-shell { min-height: 100vh; overflow: hidden; position: relative; }
+    .grain {
+      position: fixed; inset: 0; pointer-events: none; opacity: .07; z-index: 10;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
+    .ambient { position: fixed; pointer-events: none; filter: blur(14px); opacity: .65; }
+    .ambient.one { width: 42vw; height: 42vw; top: -20vw; right: -13vw; background: radial-gradient(circle, rgba(129, 40, 55, .26), transparent 68%); }
+    .ambient.two { width: 35vw; height: 35vw; bottom: -20vw; left: -12vw; background: radial-gradient(circle, rgba(179, 115, 77, .14), transparent 70%); }
+
+    .site-header {
+      width: min(1240px, calc(100% - 48px)); margin: 0 auto; padding: 26px 0 18px;
+      display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); background: none; border: 0; padding: 0; }
+    .brand-mark { width: 35px; height: 35px; display: grid; place-items: center; border: 1px solid var(--gold); color: var(--gold); font-family: var(--serif); font-size: 14px; transform: rotate(45deg); }
+    .brand-mark span { transform: rotate(-45deg); }
+    .brand-copy { text-align: left; line-height: 1; }
+    .brand-copy strong { display: block; font-size: 17px; font-weight: 500; letter-spacing: .2em; }
+    .brand-copy small { display: block; margin-top: 6px; font-size: 9px; color: var(--muted); letter-spacing: .26em; text-transform: uppercase; }
+    .main-nav { display: flex; align-items: center; gap: 30px; }
+    .nav-link { border: 0; background: none; color: var(--muted); padding: 9px 0; font-size: 13px; position: relative; transition: color .25s ease; }
+    .nav-link::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1px; background: var(--gold); transition: right .25s ease; }
+    .nav-link:hover, .nav-link.active { color: var(--ink); }
+    .nav-link.active::after { right: 0; }
+    .header-note { color: var(--muted); font-size: 11px; letter-spacing: .08em; display: flex; gap: 8px; align-items: center; }
+    .header-note i { width: 5px; height: 5px; background: var(--wine-light); border-radius: 50%; box-shadow: 0 0 10px var(--wine-light); }
+
+    .page { display: none; width: min(1240px, calc(100% - 48px)); margin: 0 auto; position: relative; z-index: 1; animation: enter .45s ease both; }
+    .page.active { display: block; }
+    @keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .hero { min-height: 680px; display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; padding: 42px 0 76px; position: relative; }
+    .hero-copy { padding: 30px 0 40px; position: relative; z-index: 1; }
+    .eyebrow { color: var(--gold); font-size: 11px; letter-spacing: .32em; text-transform: uppercase; margin-bottom: 24px; }
+    .hero h1 { margin: 0; font-family: var(--serif); font-size: clamp(48px, 7vw, 94px); line-height: 1.1; letter-spacing: .04em; font-weight: 500; }
+    .hero h1 em { color: var(--wine-light); font-style: normal; }
+    .hero-lead { color: var(--muted-light); font-family: var(--serif); font-size: 17px; line-height: 2; max-width: 350px; margin: 26px 0 34px; }
+    .hero-actions { display: flex; align-items: center; gap: 22px; }
+    .primary-btn, .ghost-btn { min-height: 46px; border-radius: 0; padding: 0 21px; transition: .25s ease; }
+    .primary-btn { background: var(--wine); border: 1px solid var(--wine); color: var(--ink); box-shadow: 0 10px 30px rgba(105, 27, 38, .22); }
+    .primary-btn:hover { background: #b14955; transform: translateY(-2px); }
+    .ghost-btn { background: transparent; border: 1px solid var(--line-bright); color: var(--muted-light); }
+    .ghost-btn:hover { color: var(--ink); border-color: var(--gold); }
+    .text-btn { background: none; border: 0; color: var(--gold); padding: 8px 0; font-size: 12px; letter-spacing: .1em; }
+    .text-btn:hover { color: var(--ink); }
+    .hero-art { height: 560px; position: relative; display: grid; place-items: center; }
+    .hero-art::before { content: ""; position: absolute; width: 70%; height: 82%; border: 1px solid rgba(214,178,133,.25); transform: rotate(8deg); }
+    .hero-art::after { content: ""; position: absolute; width: 62%; height: 74%; border: 1px solid rgba(158,60,72,.4); transform: rotate(-10deg); }
+    .portrait-main { width: 68%; height: 78%; object-fit: cover; filter: saturate(.72) contrast(1.08); position: relative; z-index: 1; box-shadow: 0 20px 70px rgba(0,0,0,.55); }
+    .portrait-main::after { content: ""; }
+    .art-stamp { position: absolute; z-index: 2; bottom: 10%; left: 5%; color: var(--gold); font-family: var(--serif); writing-mode: vertical-rl; letter-spacing: .35em; font-size: 11px; }
+    .art-caption { position: absolute; z-index: 2; top: 11%; right: 2%; color: var(--muted); font-size: 10px; letter-spacing: .18em; writing-mode: vertical-rl; }
+    .section-intro { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 40px 0 22px; border-top: 1px solid var(--line); }
+    .section-kicker { color: var(--gold); font-size: 10px; letter-spacing: .28em; text-transform: uppercase; margin-bottom: 10px; }
+    .section-title { font-family: var(--serif); font-size: 28px; font-weight: 500; margin: 0; letter-spacing: .08em; }
+    .section-desc { color: var(--muted); font-size: 12px; margin: 0 0 3px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding-bottom: 90px; }
+    .dm-card { min-width: 0; cursor: pointer; position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); transition: transform .3s ease, border-color .3s ease; }
+    .dm-card:hover { transform: translateY(-5px); border-color: rgba(214,178,133,.5); }
+    .dm-card-image { position: relative; aspect-ratio: .77; overflow: hidden; background: #221b20; }
+    .dm-card-image img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.74); transition: transform .5s ease; }
+    .dm-card:hover img { transform: scale(1.05); }
+    .dm-card-image::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(13,12,15,.84)); }
+    .card-index { position: absolute; top: 12px; left: 12px; z-index: 1; color: var(--gold); font-size: 10px; letter-spacing: .16em; }
+    .card-body { padding: 16px 16px 17px; }
+    .dm-name { font-family: var(--serif); font-size: 21px; margin: 0 0 6px; letter-spacing: .1em; }
+    .dm-meta { color: var(--muted); font-size: 11px; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .tag { border: 1px solid rgba(214,178,133,.28); color: var(--muted-light); font-size: 10px; padding: 4px 7px; }
+    .works { display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 10px; margin-top: 14px; }
+    .works span + span::before { content: "·"; margin-right: 8px; color: var(--wine-light); }
+
+    .list-page { padding: 32px 0 90px; }
+    .page-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 16px 0 28px; }
+    .page-heading h1 { margin: 0; font: 500 clamp(36px, 5vw, 62px)/1.2 var(--serif); letter-spacing: .08em; }
+    .page-heading p { margin: 0 0 5px; color: var(--muted); font-size: 12px; }
+    .tool-row { display: flex; align-items: center; gap: 12px; padding: 17px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .search-wrap { flex: 1; position: relative; }
+    .search-wrap span { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; }
+    .search-input { width: 100%; min-height: 44px; border: 1px solid var(--line); background: rgba(255,255,255,.035); color: var(--ink); padding: 0 16px 0 43px; outline: none; border-radius: 0; }
+    .search-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(214,178,133,.1); }
+    .filter-toggle { min-height: 44px; padding: 0 16px; border: 1px solid var(--line-bright); background: transparent; color: var(--muted-light); }
+    .filter-toggle.active, .filter-toggle:hover { border-color: var(--gold); color: var(--ink); }
+    .filter-panel { display: none; gap: 32px; padding: 22px 0 8px; border-bottom: 1px solid var(--line); }
+    .filter-panel.open { display: flex; }
+    .filter-group { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .filter-label { width: 48px; color: var(--muted); font-size: 11px; }
+    .filter-option { border: 1px solid var(--line); background: transparent; color: var(--muted-light); padding: 8px 12px; font-size: 11px; }
+    .filter-option.selected { color: var(--ink); border-color: var(--gold); background: rgba(214,178,133,.1); }
+    .list-status { min-height: 38px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 11px; }
+    .list-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .list-grid .dm-card { display: grid; grid-template-columns: 38% 62%; min-height: 275px; }
+    .list-grid .dm-card-image { aspect-ratio: auto; min-height: 275px; }
+    .list-grid .card-body { padding: 20px 18px; display: flex; flex-direction: column; }
+    .list-grid .works { margin-top: auto; padding-top: 13px; }
+    .empty-state { display: none; text-align: center; padding: 70px 0; border-top: 1px solid var(--line); color: var(--muted); }
+    .empty-state strong { display: block; font: 500 25px var(--serif); color: var(--ink); margin-bottom: 10px; }
+
+    .detail-page { padding: 25px 0 90px; }
+    .back-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .back-btn { background: none; border: 0; color: var(--muted-light); padding: 10px 0; }
+    .back-btn:hover { color: var(--gold); }
+    .detail-top { display: grid; grid-template-columns: .84fr 1.16fr; gap: 60px; align-items: center; padding: 20px 0 58px; border-bottom: 1px solid var(--line); }
+    .detail-portrait { position: relative; padding: 22px 24px 0 0; }
+    .detail-portrait::before { content: ""; position: absolute; inset: 0 0 22px 24px; border: 1px solid var(--wine); }
+    .detail-portrait img { width: 100%; aspect-ratio: .86; object-fit: cover; position: relative; z-index: 1; filter: saturate(.72); }
+    .detail-portrait small { position: absolute; z-index: 2; bottom: 2px; right: 0; color: var(--gold); letter-spacing: .15em; font-size: 10px; }
+    .detail-eyebrow { color: var(--gold); letter-spacing: .28em; font-size: 11px; margin-bottom: 19px; }
+    .detail-title { font: 500 clamp(48px, 7vw, 88px)/1 var(--serif); margin: 0; letter-spacing: .07em; }
+    .detail-title span { color: var(--muted); font: 400 13px var(--sans); letter-spacing: .2em; margin-left: 14px; vertical-align: middle; }
+    .identity-line { display: flex; align-items: center; gap: 16px; margin: 18px 0 22px; color: var(--muted-light); font-size: 12px; }
+    .identity-line i { width: 4px; height: 4px; border-radius: 50%; background: var(--wine-light); }
+    .positioning { font: 400 18px/2 var(--serif); color: var(--cream); max-width: 450px; margin: 0 0 26px; }
+    .detail-tags { margin-bottom: 32px; }
+    .detail-actions { display: flex; gap: 12px; align-items: center; }
+    .detail-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); margin-top: 1px; }
+    .info-block { background: var(--bg); padding: 34px 30px 36px; min-height: 190px; }
+    .info-block.full { grid-column: 1 / -1; min-height: auto; }
+    .info-label { color: var(--gold); font-size: 10px; letter-spacing: .24em; text-transform: uppercase; margin-bottom: 20px; }
+    .info-block h3 { font: 500 22px var(--serif); margin: 0 0 14px; letter-spacing: .07em; }
+    .info-block p { color: var(--muted-light); line-height: 1.9; font-size: 13px; margin: 0; max-width: 570px; }
+    .type-list { display: flex; flex-wrap: wrap; gap: 9px; }
+    .type-list span { color: var(--muted-light); border-left: 1px solid var(--wine); padding-left: 9px; font-size: 12px; }
+    .work-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .work-item { border-top: 1px solid var(--line); padding-top: 13px; color: var(--cream); font-family: var(--serif); }
+
+    .modal-backdrop { position: fixed; inset: 0; z-index: 20; display: none; place-items: center; padding: 20px; background: rgba(3, 3, 5, .77); backdrop-filter: blur(8px); }
+    .modal-backdrop.open { display: grid; }
+    .modal { width: min(420px, 100%); background: var(--panel-solid); border: 1px solid var(--line-bright); padding: 35px; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,.45); animation: modalIn .25s ease both; }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+    .modal-close { position: absolute; top: 13px; right: 15px; background: none; border: 0; color: var(--muted); font-size: 19px; }
+    .modal-mark { color: var(--gold); font-family: var(--serif); font-size: 30px; margin-bottom: 24px; }
+    .modal h2 { font: 500 25px var(--serif); margin: 0 0 13px; }
+    .modal p { color: var(--muted-light); font-size: 13px; line-height: 1.9; margin: 0 0 26px; }
+    .modal .primary-btn { width: 100%; }
+    .toast { position: fixed; z-index: 30; left: 50%; bottom: 28px; transform: translate(-50%, 16px); opacity: 0; pointer-events: none; background: var(--cream); color: #261d1a; padding: 11px 17px; font-size: 12px; transition: .3s ease; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr .82fr; min-height: 600px; }
+      .hero-art { height: 450px; }
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+      .list-grid { grid-template-columns: repeat(2, 1fr); }
+      .detail-top { gap: 36px; }
+    }
+    @media (max-width: 640px) {
+      .site-header, .page { width: min(100% - 32px, 1240px); }
+      .site-header { padding-top: 18px; }
+      .main-nav { gap: 15px; }
+      .header-note { display: none; }
+      .hero { display: flex; flex-direction: column; align-items: stretch; min-height: 0; padding-top: 35px; }
+      .hero-copy { padding: 30px 0 16px; }
+      .hero h1 { font-size: clamp(47px, 16vw, 76px); }
+      .hero-art { height: 390px; margin: 4px 0 35px; }
+      .portrait-main { width: 67%; height: 83%; }
+      .section-intro, .page-heading { align-items: start; flex-direction: column; }
+      .section-intro { gap: 14px; }
+      .feature-grid, .list-grid { grid-template-columns: 1fr; }
+      .feature-grid { gap: 14px; }
+      .feature-grid .dm-card { display: grid; grid-template-columns: 35% 65%; }
+      .feature-grid .dm-card-image { aspect-ratio: auto; min-height: 205px; }
+      .feature-grid .card-body { display: flex; flex-direction: column; }
+      .feature-grid .works { margin-top: auto; padding-top: 10px; }
+      .tool-row { align-items: stretch; flex-direction: column; }
+      .filter-toggle { width: 100%; }
+      .filter-panel.open { flex-direction: column; gap: 14px; }
+      .filter-group { align-items: start; }
+      .filter-label { padding-top: 8px; }
+      .list-grid .dm-card { min-height: 250px; }
+      .list-grid .dm-card-image { min-height: 250px; }
+      .detail-top { grid-template-columns: 1fr; gap: 40px; padding-top: 0; }
+      .detail-portrait { width: 84%; margin: 0 auto; }
+      .detail-title { font-size: 62px; }
+      .detail-title span { display: block; margin: 13px 0 0; }
+      .detail-sections { grid-template-columns: 1fr; }
+      .info-block.full { grid-column: auto; }
+      .work-list { grid-template-columns: 1fr; }
+      .modal { padding: 30px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="grain"></div><div class="ambient one"></div><div class="ambient two"></div>
+    <header class="site-header">
+      <button class="brand" data-page="home" aria-label="返回首页">
+        <span class="brand-mark"><span>秘</span></span>
+        <span class="brand-copy"><strong>秘Times</strong><small>the story begins here</small></span>
+      </button>
+      <nav class="main-nav" aria-label="主导航">
+        <button class="nav-link active" data-page="home">首页</button>
+        <button class="nav-link" data-page="list">DM档案</button>
+      </nav>
+      <div class="header-note"><i></i>认识带你进入故事的人</div>
+    </header>
+
+    <main>
+      <section id="home-page" class="page active" aria-label="首页">
+        <div class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">DM CHARACTER ARCHIVE · 01</div>
+            <h1>谁来<br><em>带你入戏</em></h1>
+            <p class="hero-lead">每一个故事，都值得被认真对待。先认识那个会带你走进故事的人。</p>
+            <div class="hero-actions">
+              <button class="primary-btn" data-page="list">探索全部 DM</button>
+              <button class="text-btn" id="shuffleHero">换一组推荐 ↗</button>
+            </div>
+          </div>
+          <div class="hero-art" aria-label="人物影像">
+            <img class="portrait-main" id="heroPortrait" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85" alt="DM人物肖像">
+            <div class="art-stamp">秘 · TIMES</div><div class="art-caption">A STORY<br>WORTH<br>FEELING</div>
+          </div>
+        </div>
+        <div class="section-intro">
+          <div><div class="section-kicker">01 / Selected storytellers</div><h2 class="section-title">秘Times DM推荐</h2></div>
+          <p class="section-desc">不设排名，每一次遇见都值得被记住</p>
+        </div>
+        <div id="featureGrid" class="feature-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="list-page" class="page list-page" aria-label="DM档案列表">
+        <div class="page-heading"><div><div class="section-kicker">02 / Meet the cast</div><h1>DM档案</h1></div><p>翻阅每一张人物名片<br>找到适合你的故事引路人</p></div>
+        <div class="tool-row">
+          <div class="search-wrap"><span>⌕</span><input id="searchInput" class="search-input" type="search" placeholder="搜索 DM 昵称" autocomplete="off"></div>
+          <button id="filterToggle" class="filter-toggle">筛选 <span>＋</span></button>
+        </div>
+        <div id="filterPanel" class="filter-panel">
+          <div class="filter-group"><div class="filter-label">性别</div><button class="filter-option" data-filter="gender" data-value="女">女</button><button class="filter-option" data-filter="gender" data-value="男">男</button></div>
+          <div class="filter-group"><div class="filter-label">类型</div><button class="filter-option" data-filter="type" data-value="情感">情感</button><button class="filter-option" data-filter="type" data-value="推理">推理</button><button class="filter-option" data-filter="type" data-value="恐怖">恐怖</button><button class="filter-option" data-filter="type" data-value="欢乐">欢乐</button><button class="filter-option" data-filter="type" data-value="机制">机制</button><button class="filter-option" data-filter="type" data-value="还原">还原</button></div>
+          <button id="resetFilters" class="text-btn">重置</button>
+        </div>
+        <div class="list-status"><span id="resultCount">全部 8 位 DM</span><span id="searchHint">随机展示</span></div>
+        <div id="listGrid" class="list-grid"></div>
+        <div id="emptyState" class="empty-state"><strong>暂无结果</strong><span>换一个昵称或试试其他筛选条件</span></div>
+      </section>
+
+      <section id="detail-page" class="page detail-page" aria-label="DM详情">
+        <div class="back-row"><button id="backToList" class="back-btn">← 返回 DM 档案</button><button id="shareBtn" class="text-btn">分享这张名片 ↗</button></div>
+        <div id="detailContent"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="specifyModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal"><button id="closeModal" class="modal-close" aria-label="关闭">×</button><div class="modal-mark">秘</div><h2 id="modalTitle">想指定这位 DM？</h2><p>请联系店员确认档期，我们会尽力让合适的人，在合适的故事里与你相遇。</p><button id="modalDone" class="primary-btn">知道了</button></div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const dms = [
+      { id: 'xiaoyu', name: '小雨', gender: '女', years: 3, sessions: '300+', position: '最擅长把玩家带进情绪里的 DM', tags: ['细腻演绎', '情绪感染', '角色代入强'], types: ['情感', '还原', '欢乐'], works: ['《遗愿清单》', '《云边来信》', '《长安谜局》'], suitable: '适合喜欢沉浸体验、重视情绪流动，也愿意认真对待每一个角色的玩家。', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85' },
+      { id: 'ali', name: '阿离', gender: '女', years: 5, sessions: '680+', position: '让每一次沉默，都成为故事的一部分', tags: ['情绪铺陈', '温柔控场', '细节捕捉'], types: ['情感', '推理', '还原'], works: ['《无人生还》', '《春日迟迟》', '《雾中人》'], suitable: '适合喜欢慢慢进入状态、享受人物关系和微妙情绪变化的玩家。', image: 'https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?auto=format&fit=crop&w=900&q=85' },
+      { id: 'beichen', name: '北辰', gender: '男', years: 4, sessions: '420+', position: '把复杂的局，讲成你愿意相信的故事', tags: ['逻辑梳理', '节奏精准', '氛围营造'], types: ['推理', '机制', '还原'], works: ['《月光失格》', '《第七封信》', '《暗河》'], suitable: '适合喜欢信息推演、享受抽丝剥茧与高密度故事推进的玩家。', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85' },
+      { id: 'tuanzi', name: '团子', gender: '女', years: 2, sessions: '190+', position: '负责让你笑，也负责让你记住', tags: ['欢乐气氛', '互动自然', '反应灵活'], types: ['欢乐', '机制', '情感'], works: ['《开局一只鹅》', '《我们恋爱吧》', '《小城故事》'], suitable: '适合喜欢轻松氛围、在欢笑里完成沉浸，也愿意主动参与的玩家。', image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=85' },
+      { id: 'shisan', name: '十三', gender: '男', years: 6, sessions: '860+', position: '在真相抵达之前，先让你相信一切', tags: ['声音表现', '悬念设计', '沉浸叙事'], types: ['恐怖', '推理', '还原'], works: ['《午夜来电》', '《无声告白》', '《纸人》'], suitable: '适合喜欢强氛围、悬疑感和故事反转，希望被带入另一种现实的玩家。', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=85' },
+      { id: 'nannan', name: '楠楠', gender: '女', years: 3, sessions: '260+', position: '擅长把一场游戏，变成一段共同经历', tags: ['共情陪伴', '角色塑造', '情感推进'], types: ['情感', '欢乐'], works: ['《南风知我意》', '《一封未寄的信》', '《初雪》'], suitable: '适合看重陪伴感、喜欢角色成长和情感回响的玩家。', image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&q=85' },
+      { id: 'mohe', name: '墨河', gender: '男', years: 7, sessions: '1000+', position: '给你一把钥匙，剩下的由你打开', tags: ['硬核推理', '机制设计', '全局掌控'], types: ['推理', '机制', '阵营'], works: ['《黄昏剧场》', '《七日审判》', '《迷雾港》'], suitable: '适合喜欢挑战、善于观察，享受用自己的选择改变故事走向的玩家。', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85' },
+      { id: 'yiyi', name: '一一', gender: '女', years: 4, sessions: '510+', position: '让每一份心事，都被故事温柔接住', tags: ['共情表达', '温柔引导', '情绪爆发'], types: ['情感', '恐怖', '还原'], works: ['《玫瑰失语时》', '《夏夜未眠》', '《回到那年》'], suitable: '适合喜欢深度情绪、在故事里寻找共鸣与出口的玩家。', image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=80' }
+    ];
+
+    const state = { page: 'home', activeDm: dms[0], search: '', filters: { gender: '', types: [] }, featured: [] };
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const shuffle = (arr) => [...arr].sort(() => Math.random() - .5);
+
+    function cardTemplate(dm, index = 1) {
+      return `<article class="dm-card" data-id="${dm.id}" tabindex="0" aria-label="查看 ${dm.name} 的 DM 名片">
+        <div class="dm-card-image"><span class="card-index">0${index}</span><img src="${dm.image}" alt="${dm.name} 的人物肖像" loading="lazy"></div>
+        <div class="card-body"><h3 class="dm-name">${dm.name}</h3><div class="dm-meta">${dm.gender} · 从业 ${dm.years} 年 · ${dm.sessions} 场</div><div class="tag-row">${dm.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div><div class="works">${dm.works.map(w => `<span>${w}</span>`).join('')}</div></div>
+      </article>`;
+    }
+
+    function bindCards() {
+      $$('.dm-card').forEach(card => {
+        card.addEventListener('click', () => openDetail(card.dataset.id));
+        card.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openDetail(card.dataset.id); } });
+      });
+    }
+
+    function renderFeatured() {
+      state.featured = shuffle(dms).slice(0, 4);
+      $('#featureGrid').innerHTML = state.featured.map((dm, i) => cardTemplate(dm, i + 1)).join('');
+      bindCards();
+      $('#heroPortrait').src = state.featured[0].image;
+      $('#heroPortrait').alt = `${state.featured[0].name} 的人物肖像`;
+    }
+
+    function filteredDms() {
+      if (state.search.trim()) {
+        const keyword = state.search.trim().toLowerCase();
+        return dms.filter(dm => dm.name.toLowerCase().includes(keyword)).sort((a, b) => a.name.indexOf(keyword) - b.name.indexOf(keyword));
+      }
+      return shuffle(dms).filter(dm => (!state.filters.gender || dm.gender === state.filters.gender) && (!state.filters.types.length || state.filters.types.some(type => dm.types.includes(type))));
+    }
+
+    function renderList() {
+      const results = filteredDms();
+      $('#listGrid').innerHTML = results.map((dm, i) => cardTemplate(dm, i + 1)).join('');
+      $('#listGrid').style.display = results.length ? 'grid' : 'none';
+      $('#emptyState').style.display = results.length ? 'none' : 'block';
+      $('#resultCount').textContent = state.search ? `找到 ${results.length} 位 DM` : `${state.filters.gender || state.filters.types.length ? '筛选结果' : '全部'} ${results.length} 位 DM`;
+      $('#searchHint').textContent = state.search ? '按昵称匹配' : '随机展示';
+      bindCards();
+    }
+
+    function openDetail(id) {
+      state.activeDm = dms.find(dm => dm.id === id) || dms[0];
+      const dm = state.activeDm;
+      $('#detailContent').innerHTML = `<div class="detail-top"><div class="detail-portrait"><img src="${dm.image}" alt="${dm.name} 的人物肖像"><small>DM PROFILE · ${dm.id.toUpperCase()}</small></div><div class="detail-copy"><div class="detail-eyebrow">秘TIMES / DM CHARACTER</div><h1 class="detail-title">${dm.name}<span>${dm.gender} · ${dm.years} YEARS</span></h1><div class="identity-line"><span>从业 ${dm.years} 年</span><i></i><span>累计带本 ${dm.sessions} 场</span></div><p class="positioning">「${dm.position}」</p><div class="tag-row detail-tags">${dm.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div><div class="detail-actions"><button id="specifyBtn" class="primary-btn">指定这个 DM</button><button class="ghost-btn" id="detailShare">分享名片</button></div></div></div><div class="detail-sections"><section class="info-block"><div class="info-label">Expertise</div><h3>擅长类型</h3><div class="type-list">${dm.types.map(t => `<span>${t}</span>`).join('')}</div></section><section class="info-block"><div class="info-label">For players</div><h3>适合这样的玩家</h3><p>${dm.suitable}</p></section><section class="info-block full"><div class="info-label">Selected works</div><h3>代表作品</h3><div class="work-list">${dm.works.map((w, i) => `<div class="work-item">0${i + 1}　${w}</div>`).join('')}</div></section></div>`;
+      showPage('detail');
+      $('#specifyBtn').addEventListener('click', () => $('#specifyModal').classList.add('open'));
+      $('#detailShare').addEventListener('click', shareCard);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showPage(page) {
+      state.page = page;
+      $$('.page').forEach(el => el.classList.toggle('active', el.id === `${page}-page`));
+      $$('.nav-link').forEach(el => el.classList.toggle('active', el.dataset.page === (page === 'detail' ? 'list' : page)));
+      if (page === 'list') renderList();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function shareCard() {
+      const message = `已复制 ${state.activeDm.name} 的 DM 名片链接`;
+      if (navigator.clipboard) navigator.clipboard.writeText(`${location.href.split('#')[0]}#dm/${state.activeDm.id}`).catch(() => {});
+      showToast(message);
+    }
+    function showToast(message) { const toast = $('#toast'); toast.textContent = message; toast.classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2400); }
+
+    $$('.nav-link, [data-page="home"], [data-page="list"]').forEach(el => el.addEventListener('click', () => showPage(el.dataset.page)));
+    $('#shuffleHero').addEventListener('click', () => { renderFeatured(); showToast('推荐人物已更新'); });
+    $('#filterToggle').addEventListener('click', () => { $('#filterPanel').classList.toggle('open'); $('#filterToggle').classList.toggle('active'); $('#filterToggle span').textContent = $('#filterPanel').classList.contains('open') ? '－' : '＋'; });
+    $('#searchInput').addEventListener('input', (event) => { state.search = event.target.value; if (state.search.trim()) { state.filters = { gender: '', types: [] }; $$('.filter-option').forEach(btn => btn.classList.remove('selected')); } renderList(); });
+    $$('.filter-option').forEach(option => option.addEventListener('click', () => { state.search = ''; $('#searchInput').value = ''; const kind = option.dataset.filter; const value = option.dataset.value; if (kind === 'gender') { state.filters.gender = state.filters.gender === value ? '' : value; $$('.filter-option[data-filter="gender"]').forEach(btn => btn.classList.toggle('selected', btn.dataset.value === state.filters.gender)); } else { state.filters.types = state.filters.types.includes(value) ? state.filters.types.filter(v => v !== value) : [...state.filters.types, value]; option.classList.toggle('selected'); } renderList(); }));
+    $('#resetFilters').addEventListener('click', () => { state.search = ''; $('#searchInput').value = ''; state.filters = { gender: '', types: [] }; $$('.filter-option').forEach(btn => btn.classList.remove('selected')); renderList(); });
+    $('#backToList').addEventListener('click', () => showPage('list'));
+    $('#shareBtn').addEventListener('click', shareCard);
+    $('#closeModal').addEventListener('click', () => $('#specifyModal').classList.remove('open'));
+    $('#modalDone').addEventListener('click', () => $('#specifyModal').classList.remove('open'));
+    $('#specifyModal').addEventListener('click', (event) => { if (event.target.id === 'specifyModal') $('#specifyModal').classList.remove('open'); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') $('#specifyModal').classList.remove('open'); });
+
+    renderFeatured();
+    if (location.hash.startsWith('#dm/')) openDetail(location.hash.slice(4));
+  </script>
+</body>
+</html>
