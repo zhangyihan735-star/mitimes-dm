@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>秘Times</title></head>
+<body>
+<script>
+  const projectBase = location.pathname.match(/^\/[^/]+\//)?.[0] || '/';
+  const route = location.pathname.replace(projectBase, '').replace(/^\/+|\/+$/g, '');
+  location.replace(`${projectBase}?route=${encodeURIComponent(route || 'home')}`);
+</script>
+</body>
+</html>
