@@ -1,6 +1,8 @@
 # 秘Times DM 人物展示工具
 
-这是一个可直接部署到 Vercel 的静态单页原型，入口文件为 `index.html`。
+这是一个已发布到 GitHub Pages 的静态单页原型，入口文件为 `index.html`。
+
+线上地址：<https://zhangyihan735-star.github.io/mitimes-dm/>
 
 ## 已实现
 
@@ -16,9 +18,9 @@
 
 ## 部署
 
-项目根目录已经包含 `vercel.json`。在 Vercel 控制台导入此目录后，直接使用默认静态站点设置即可，不需要构建命令和输出目录。
+GitHub Pages 当前从 `main` 分支的根目录发布，不需要构建命令和输出目录。后续只要向 `main` 推送新版本，GitHub Pages 会自动重新构建。
 
-如果使用 CLI：
+如果未来改用 Vercel，仍可以使用 CLI：
 
 ```bash
 npx vercel --prod
@@ -46,4 +48,4 @@ DM 数据目前仍在 `index.html` 的 `dms` 数组中，适合原型演示，�
 
 前端接入后，将 `dms` 数组替换成 Supabase 查询；审核通过后更新 `dm_profiles`，前台下次加载自动读取最新资料。照片上传使用 Supabase Storage，数据库只保存图片 URL。
 
-正式接入前还需要配置：Supabase 项目、管理员账号、微信登录参数，以及 GitHub Pages 或 Vercel 的环境变量。
+正式接入后台前还需要配置：Supabase 项目、管理员账号、微信登录参数，以及正式环境的环境变量。当前线上版本仍使用 `index.html` 内的演示数据，尚未接入管理员登录或数据库写入。
